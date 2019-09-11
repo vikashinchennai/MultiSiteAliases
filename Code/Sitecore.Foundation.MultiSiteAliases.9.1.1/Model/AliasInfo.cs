@@ -63,24 +63,15 @@
 
             customAliases.ItemId = item.ID;
             var selectedItemFullPath = item.Paths.FullPath;
-            var sites = new List<Sitecore.Sites.Site>()
-                                {
-                                    Sitecore.Sites.SiteManager.GetSite("Site A"),
-                                    Sitecore.Sites.SiteManager.GetSite("Site B"),
-                                    Sitecore.Sites.SiteManager.GetSite("Site C")
-                                };
-            //foreach (var site in Sitecore.Sites.SiteManager.GetSites()) //TODO: UnComment
-            if (sites != null)
+
+            foreach (var site in Sitecore.Sites.SiteManager.GetSites())
             {
-                foreach (var site in sites)
+                var destination = site?.Properties[MultiSiteAliases.Constants.SiteProperties.SiteLevelAliases];
+                if (!string.IsNullOrEmpty(destination) && ID.TryParse(destination, out ID id) && !id.IsNull && id.Guid != Guid.Empty)
                 {
-                    var destination = site?.Properties[MultiSiteAliases.Constants.SiteProperties.SiteLevelAliases];
-                    if (!string.IsNullOrEmpty(destination) && ID.TryParse(destination, out ID id) && !id.IsNull && id.Guid != Guid.Empty)
-                    {
-                        if (selectedItemFullPath.StartsWith(site.Properties[MultiSiteAliases.Constants.SiteProperties.RootPath])
-                                    || selectedItemFullPath.StartsWith(MultiSiteAliases.Constants.MediaPath))
-                            ProcessEachSite(item, customAliases, site, id);
-                    }
+                    if (selectedItemFullPath.StartsWith(site.Properties[MultiSiteAliases.Constants.SiteProperties.RootPath])
+                                || selectedItemFullPath.StartsWith(MultiSiteAliases.Constants.MediaPath))
+                        ProcessEachSite(item, customAliases, site, id);
                 }
             }
 
